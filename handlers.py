@@ -23,7 +23,7 @@ async def start_handler(message: Message):
 async def start_pos(message: Message, state: FSMContext):
     if message.text == "МЦД-1":
         await state.set_state(Path.start_point)
-        await message.answer("Выбери начальную станцию")
+        await message.answer("Выбери начальную станцию", reply_markup=keyboards.diametr1)
         
     elif message.text == "МЦД-2":
         await state.set_state(Path.start_point)
@@ -31,11 +31,11 @@ async def start_pos(message: Message, state: FSMContext):
         
     elif message.text == "МЦД-3":
         await state.set_state(Path.start_point)
-        await message.answer("Выбери начальную станцию")
+        await message.answer("Выбери начальную станцию", reply_markup=keyboards.diametr3)
         
     elif message.text == "МЦД-4":
         await state.set_state(Path.start_point)
-        await message.answer("Выбери начальную станцию")    
+        await message.answer("Выбери начальную станцию", reply_markup=keyboards.diametr4)    
     
     
 @router.message(Path.start_point)
@@ -49,5 +49,5 @@ async def end_pos(message: Message, state: FSMContext):
 async def finish_pos(message: Message, state: FSMContext):
     await state.update_data(end_point = message.text)
     data = await state.get_data()
-    await message.answer(f"Блиайшая электричка от {data['start_point']} до {data['end_point']}")
+    await message.answer(f"Блиайшая электричка от {data['start_point']} до {data['end_point']}", reply_markup=keyboards.choose_diametr)
     await state.clear()
