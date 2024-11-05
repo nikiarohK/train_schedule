@@ -1,12 +1,13 @@
 from aiogram import types, F, Router
 from aiogram.types import Message
 from aiogram.filters import Command
-import keyboards as kb
+import keyboards 
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
 
 router = Router()
+
 
 class Path(StatesGroup):
     start_point = State()
@@ -15,7 +16,7 @@ class Path(StatesGroup):
 
 @router.message(Command("start"))
 async def start_handler(message: Message):
-    await message.answer(f"Привет {message.from_user.full_name} !\nВыбери нужный диаметр",reply_markup=kb.start_menu)
+    await message.answer(f"Привет {message.from_user.full_name} !\nВыбери нужный диаметр", reply_markup=keyboards.choose_diametr)
 
 
 @router.message(F.text.in_({"МЦД-1", "МЦД-2", "МЦД-3", "МЦД-4"}))
@@ -26,7 +27,7 @@ async def start_pos(message: Message, state: FSMContext):
         
     elif message.text == "МЦД-2":
         await state.set_state(Path.start_point)
-        await message.answer("Выбери начальную станцию")
+        await message.answer("Выбери начальную станцию", reply_markup=keyboards.diametr2)
         
     elif message.text == "МЦД-3":
         await state.set_state(Path.start_point)
