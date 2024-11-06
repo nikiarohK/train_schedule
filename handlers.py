@@ -4,7 +4,14 @@ from aiogram.filters import Command
 import keyboards 
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
+import sqlite3
+from bs4 import BeautifulSoup
+import requests
 
+
+
+connection = sqlite3.connect('name_stations.db')
+cursor = connection.cursor()
 
 router = Router()
 
@@ -48,6 +55,27 @@ async def end_pos(message: Message, state: FSMContext):
 @router.message(Path.end_point)
 async def finish_pos(message: Message, state: FSMContext):
     await state.update_data(end_point = message.text)
+    
     data = await state.get_data()
-    await message.answer(f"Блиайшая электричка от {data['start_point']} до {data['end_point']}", reply_markup=keyboards.choose_diametr)
+    url = await make_url(data['start_point'], data['end_point'])
+    await get_time(url)
+    await message.answer(f"Блиайшая электричка от {str(data['start_point']).lower()} до {str(data['end_point']).lower()}", reply_markup=keyboards.choose_diametr)
     await state.clear()
+    
+    
+async def make_url(start_point_name, end_point_name):
+    
+    cursor.execute('SELECT title_for_url FROM diametr2 WHERE title = ?', (start_point_name,))
+    start = cursor.fetchall()
+
+    cursor.execute('SELECT title_for_url FROM diametr2 WHERE title = ?', (end_point_name,))
+    end = cursor.fetchall()
+    
+    return f"https://rasp.yandex.ru/suburban/{start[0][0]}--{end[0][0]}/today"
+
+async def get_time(url):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, "lxml")
+    block = soup.find_all("tr")
+    print(block)
+
